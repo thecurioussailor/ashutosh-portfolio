@@ -1,85 +1,69 @@
 "use client";
 
-import { useState } from "react";
+import Image from "next/image";
 import { motion, useReducedMotion } from "motion/react";
 import TextReveal from "./TextReveal";
-import InteractiveCat from "./InteractiveCat";
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
 
 export default function Hero() {
+  const shouldReduceMotion = useReducedMotion();
+
+  const fadeIn = (delay: number, y = 12) => ({
+    initial: { opacity: 0, y: shouldReduceMotion ? 0 : y },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.8, delay, ease: easeOut },
+  });
+
   return (
     <section
       id="home"
       className="relative flex h-svh flex-col bg-[#efe6d5] p-3 sm:p-5 lg:p-6"
     >
-      <div className="relative h-full overflow-hidden rounded-[36px] bg-[#fcf3e3] sm:rounded-[60px] lg:rounded-[90px] xl:rounded-[120px]">
-        {/* cat artwork, filling the stage behind the text */}
-        <div className="absolute inset-0 z-0 flex items-center justify-center">
-          <CatArt />
-        </div>
+      <div className="relative h-full overflow-hidden rounded-[36px] bg-[#3f8fe0] sm:rounded-[60px] lg:rounded-[90px] xl:rounded-[120px]">
+        {/* landscape, filling the stage; cropped toward the sky/horizon */}
+        <Image
+          src="/images/hero-background.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="z-0 object-cover object-[35%_60%] sm:object-[40%_60%] lg:object-center"
+        />
 
-        {/* identity + description, centered on top of the artwork */}
-        <div className="relative z-10 flex h-full flex-col items-center justify-center gap-4 px-6 text-center sm:px-10 lg:px-16">
-          <div className="flex w-full flex-col items-center gap-4 lg:flex-row lg:items-start lg:justify-between lg:text-left">
-            <div>
-              <h1 className="font-display text-[16vw] leading-[0.92] tracking-[-0.16em] text-[#211a13] sm:text-[9vw] lg:text-[6vw]">
-                <TextReveal text="Ashutosh" delay={0.1} mode="mount" />
-              </h1>
+        {/* soft local scrim behind the text only, keeps the landscape vivid */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1] bg-[radial-gradient(ellipse_60%_45%_at_50%_42%,rgba(10,25,50,0.28),transparent_70%)]"
+        />
 
-              <motion.p
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.55, ease: easeOut }}
-                className="font-display mt-3 text-[11px] pl-2 tracking-[0.04em] text-[#6b5f52] uppercase sm:mt-4 sm:text-xs"
-              >
-                Software Engineer · Builder
-              </motion.p>
-            </div>
+        <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 pb-28 text-center [text-shadow:0_2px_24px_rgba(8,20,40,0.35)] sm:px-10 sm:pb-24 lg:px-16">
+          <motion.p
+            {...fadeIn(0.05, 10)}
+            className="font-mono-label text-[10px] tracking-[0.2em] text-white/90 uppercase sm:text-xs"
+          >
+            Build · Explore · Learn · Repeat
+          </motion.p>
 
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.7, ease: easeOut }}
-              className="max-w-[220px] text-[13px] leading-relaxed text-[#6b5f52] sm:max-w-xs sm:text-[15px] lg:max-w-sm lg:pt-3 lg:text-base"
-            >
-              I build products, systems, and infrastructure from first
-              principles.
-            </motion.p>
-          </div>
+          <h1 className="font-display mt-5 text-[14vw] leading-[0.92] tracking-[-0.04em] text-white sm:mt-6 sm:text-[11vw] lg:text-[9vw]">
+            <TextReveal text="Ashutosh" delay={0.2} mode="mount" />
+          </h1>
+
+          <motion.p
+            {...fadeIn(0.6, 10)}
+            className="font-display mt-4 text-[11px] tracking-[0.08em] text-white/95 uppercase sm:mt-5 sm:text-sm"
+          >
+            Software Engineer · Builder
+          </motion.p>
+
+          <motion.p
+            {...fadeIn(0.75, 10)}
+            className="mt-4 max-w-[260px] text-[14px] leading-relaxed text-white/90 sm:max-w-sm sm:text-base lg:max-w-md lg:text-lg"
+          >
+            Turning ideas into products, systems, and infrastructure.
+          </motion.p>
         </div>
       </div>
     </section>
-  );
-}
-
-function CatArt() {
-  const shouldReduceMotion = useReducedMotion();
-  const [settled, setSettled] = useState(false);
-
-  return (
-    <motion.div
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }}
-      animate={
-        shouldReduceMotion
-          ? { opacity: 1, y: 0 }
-          : settled
-            ? { opacity: 1, y: [0, -5, 0] }
-            : { opacity: 1, y: 0 }
-      }
-      transition={
-        shouldReduceMotion
-          ? { duration: 0 }
-          : settled
-            ? { duration: 4.5, repeat: Infinity, ease: "easeInOut" }
-            : { duration: 1, delay: 0.9, ease: easeOut }
-      }
-      className="relative h-[42%] w-[60%] sm:h-[48%] sm:w-[52%] lg:h-[52%] lg:w-[42%]"
-      onAnimationComplete={() => {
-        if (!settled) setSettled(true);
-      }}
-    >
-      <InteractiveCat />
-    </motion.div>
   );
 }

@@ -1,34 +1,54 @@
 export type ExperienceEntry = {
-  year: string;
+  number: string;
+  company: string;
+  href?: string;
   role: string;
-  org: string;
+  dates: string;
   description: string;
-  tags?: string[];
+  technologies: string[];
 };
 
+// Most recent first.
 export const experience: ExperienceEntry[] = [
   {
-    year: "2025 — Present",
+    number: "01",
+    company: "Unboxed",
+    href: "https://www.beunboxed.com/",
+    role: "Solana Mobile Engineer",
+    dates: "Oct 2025 — Mar 2026",
+    description:
+      "Built and shipped a production fantasy sports application for Super Phoenix DAO, combining React Native, Solana Mobile, USDC payments, and a Supabase backend.",
+    technologies: ["React Native", "Expo", "Solana", "TypeScript", "Supabase"],
+  },
+  {
+    number: "02",
+    company: "Ionfirm",
+    href: "https://ionfirm.com/",
+    role: "Full Stack Developer",
+    dates: "Feb 2024 — Jun 2025",
+    description:
+      "Led development of client products and internal SaaS tools, owning the stack from frontend and APIs through cloud deployment.",
+    technologies: ["Next.js", "TypeScript", "Node.js", "PostgreSQL", "AWS"],
+  },
+  {
+    number: "03",
+    company: "Volvo & Eicher Commercial Vehicles",
+    href: "https://www.vecv.in/",
     role: "Software Engineer",
-    org: "[Placeholder — current role]",
+    dates: "Mar 2023 — Jan 2024",
     description:
-      "[Placeholder — replace with a concise description of scope and focus at this role.]",
-    tags: ["Infrastructure", "Backend"],
+      "Built backend services and React dashboards for manufacturing and logistics workflows, with automated testing, CI/CD, and AWS deployment.",
+    technologies: ["Java", "Spring Boot", "React", "Microservices", "AWS", "DevOps"],
   },
-  {
-    year: "2024 — 2025",
-    role: "Independent Builder",
-    org: "Bonfire, Solana Vault, Haunted Dorm",
-    description:
-      "Designed and shipped independent projects spanning payments infrastructure, developer tooling, and on-chain gaming.",
-    tags: ["Solana", "Rust", "TypeScript"],
-  },
-  {
-    year: "[Placeholder]",
-    role: "[Placeholder — role]",
-    org: "[Placeholder — company / project]",
-    description:
-      "[Placeholder — replace with real experience once details are confirmed.]",
-    tags: ["[Placeholder]"],
-  },
+];
+
+export type CurrentActivity = {
+  label: string;
+  detail: string;
+};
+
+export const currentActivity: CurrentActivity[] = [
+  { label: "Solana Fellowship", detail: "Technical program / community" },
+  { label: "Turbin3", detail: "Builder cohort / technical program" },
+  { label: "Independent Projects", detail: "Products, developer tools, and experiments" },
 ];

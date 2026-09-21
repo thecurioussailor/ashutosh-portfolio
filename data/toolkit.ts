@@ -1,12 +1,46 @@
-export type ToolkitCategory = {
+export type ToolkitRow = {
   label: string;
   items: string[];
+  direction: "left" | "right";
+  duration: number;
 };
 
-export const toolkit: ToolkitCategory[] = [
-  { label: "Languages", items: ["Rust", "TypeScript", "Python", "JavaScript"] },
-  { label: "Frontend", items: ["Next.js", "React", "Tailwind"] },
-  { label: "Backend", items: ["Node.js", "PostgreSQL", "Redis"] },
-  { label: "Blockchain", items: ["Solana", "Anchor"] },
-  { label: "Infrastructure", items: ["Docker", "AWS", "Vercel"] },
+// Most relevant to a frontend-leaning full-stack / Web3 positioning first.
+export const toolkitRows: ToolkitRow[] = [
+  {
+    label: "Core / Frontend",
+    items: [
+      "React",
+      "TypeScript",
+      "Rust",
+      "Next.js",
+      "JavaScript",
+      "Tailwind",
+      "React Native",
+      "Expo",
+    ],
+    direction: "left",
+    duration: 42,
+  },
+  {
+    label: "Backend / Data",
+    items: [
+      "Node.js",
+      "PostgreSQL",
+      "MongoDB",
+      "MySQL",
+      "Prisma",
+      "Redis",
+      "Spring Boot",
+      "Java",
+    ],
+    direction: "right",
+    duration: 48,
+  },
+  {
+    label: "Blockchain / Infrastructure",
+    items: ["Solana", "Anchor", "Docker", "AWS", "Vercel", "Supabase", "Cloudflare"],
+    direction: "left",
+    duration: 36,
+  },
 ];
