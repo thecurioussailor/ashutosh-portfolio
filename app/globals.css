@@ -96,6 +96,27 @@ body {
   }
 }
 
+/* About — pills orbiting the photo, gently floating (desktop) */
+.about-pill {
+  transform: rotate(var(--rot, 0deg));
+}
+@media (min-width: 1024px) {
+  .about-pill {
+    left: var(--x);
+    top: var(--y);
+    animation: pill-float 4.4s ease-in-out var(--delay, 0s) infinite;
+  }
+}
+@keyframes pill-float {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
+  }
+  50% {
+    transform: translate(-50%, calc(-50% - 8px)) rotate(var(--rot, 0deg));
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }

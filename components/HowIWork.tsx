@@ -161,8 +161,8 @@ export default function HowIWork() {
   };
 
   return (
-    // wrapper paints the corner cut-outs: cream on top (matches the projects section), page bg below
-    <div className="bg-[linear-gradient(to_bottom,#fffdf6_50%,var(--background)_50%)]">
+    // wrapper paints the corner cut-outs cream: projects above, About below
+    <div className="bg-[#fffdf6]">
       <section
         id="process"
         className="relative overflow-hidden rounded-[36px] bg-[#F8D6F4] pt-24 pb-28 text-[#111] sm:rounded-[60px] sm:pt-32 sm:pb-36 lg:rounded-[90px] xl:rounded-[120px]"

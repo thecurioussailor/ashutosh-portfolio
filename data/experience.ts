@@ -42,13 +42,12 @@ export const experience: ExperienceEntry[] = [
   },
 ];
 
-export type CurrentActivity = {
-  label: string;
-  detail: string;
-};
-
-export const currentActivity: CurrentActivity[] = [
-  { label: "Solana Fellowship", detail: "Technical program / community" },
-  { label: "Turbin3", detail: "Builder cohort / technical program" },
-  { label: "Independent Projects", detail: "Products, developer tools, and experiments" },
+// "Built with & for" strip under the timeline
+export const builtWith = [
+  "Unboxed",
+  "Super Phoenix DAO",
+  "Ionfirm",
+  "VECV",
+  "Solana Fellowship",
+  "Turbin3",
 ];
