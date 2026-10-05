@@ -8,7 +8,7 @@ const TILTS = [-1.5, 1.2, -1];
 
 export default function Experience() {
   return (
-    // wrapper paints the corner cut-outs: cream above (About), page bg below (Toolkit)
+    // wrapper paints the corner cut-outs: cream above (About), page bg below
     <div className="bg-[linear-gradient(to_bottom,#fffdf6_50%,var(--background)_50%)]">
       <section
         id="experience"

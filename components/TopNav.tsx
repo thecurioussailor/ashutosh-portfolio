@@ -10,7 +10,6 @@ const links = [
   { label: "How I work", href: "#process" },
   { label: "About", href: "#about" },
   { label: "Experience", href: "#experience" },
-  { label: "Log", href: "#log" },
 ];
 
 const pill =
