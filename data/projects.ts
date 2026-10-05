@@ -7,6 +7,8 @@ export type Project = {
   year: string;
   technologies: string[];
   image: string;
+  /** small pill shown on the project cover, e.g. "FEATURED" */
+  badge?: string;
   featured?: boolean;
   links?: { label: string; href: string }[];
   caseStudy: {
@@ -30,6 +32,7 @@ export const projects: Project[] = [
     year: "2025 — 2026",
     technologies: ["Solana", "Rust", "TypeScript"],
     image: "/projects/bonfire",
+    badge: "Featured",
     featured: true,
     caseStudy: {
       overview:
@@ -56,6 +59,7 @@ export const projects: Project[] = [
     year: "2025",
     technologies: ["Rust", "WebSocket", "Redis"],
     image: "/projects/trueman",
+    badge: "Featured",
     featured: true,
     caseStudy: {
       overview:
@@ -82,6 +86,7 @@ export const projects: Project[] = [
     year: "2026",
     technologies: ["Next.js", "TypeScript", "Claude SDK"],
     image: "/projects/eggcode",
+    badge: "New",
     featured: true,
     caseStudy: {
       overview:
@@ -108,6 +113,7 @@ export const projects: Project[] = [
     year: "2025",
     technologies: ["Solana", "Rust", "Anchor", "TypeScript"],
     image: "/projects/solana-vault",
+    badge: "Dev Tool",
     caseStudy: {
       overview:
         "Solana Vault is an Anchor-based program that gives developers a composable, auditable building block for programmable custody on Solana.",
@@ -133,6 +139,7 @@ export const projects: Project[] = [
     year: "2024",
     technologies: ["Solana", "TypeScript", "React"],
     image: "/projects/haunted-dorm",
+    badge: "On-chain Game",
     caseStudy: {
       overview:
         "Haunted Dorm is an on-chain multiplayer game exploring the boundary between real-time gameplay and blockchain-verified state.",
@@ -158,6 +165,7 @@ export const projects: Project[] = [
     year: "—",
     technologies: ["TBD"],
     image: "/projects/placeholder",
+    badge: "Coming Soon",
     caseStudy: {
       overview: "[Placeholder — replace with project overview.]",
       problem: "[Placeholder — replace with the problem statement.]",

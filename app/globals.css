@@ -24,6 +24,8 @@
   --color-accent-dim: var(--accent-dim);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-poster: var(--font-unbounded);
+  --font-hand: var(--font-caveat);
 }
 
 * {
@@ -73,6 +75,23 @@ body {
 /* editorial hairline used across the site instead of shadows/rounded cards */
 .hairline {
   border-color: var(--border);
+}
+
+/* project carousel — tilted "book cover" cards */
+.tilt-card {
+  transform: translateY(var(--y, 0px)) rotate(var(--r, 0deg));
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.tilt-card:hover,
+.tilt-card:focus-visible {
+  transform: translateY(calc(var(--y, 0px) - 12px)) rotate(0deg);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes toolkit-marquee {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Silkscreen } from "next/font/google";
+import { Caveat, Geist, Geist_Mono, Silkscreen, Unbounded } from "next/font/google";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import FloatingNav from "@/components/FloatingNav";
@@ -21,6 +21,16 @@ const silkscreen = Silkscreen({
   subsets: ["latin"],
 });
 
+const unbounded = Unbounded({
+  variable: "--font-unbounded",
+  subsets: ["latin"],
+});
+
+const caveat = Caveat({
+  variable: "--font-caveat",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "Ashutosh Sagar — Software Engineer",
   description:
@@ -31,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${silkscreen.variable} antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${silkscreen.variable} ${unbounded.variable} ${caveat.variable} antialiased`}
     >
       <body className="flex min-h-screen flex-col bg-background text-foreground">
         <SmoothScroll>

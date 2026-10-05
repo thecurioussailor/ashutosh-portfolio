@@ -1,16 +1,5 @@
 import type { ReactElement } from "react";
 
-type ProjectVisualProps = {
-  slug: string;
-  number: string;
-};
-
-const TONES: Record<string, string> = {
-  bonfire: "bg-[#13120e]",
-  trueman: "bg-[#0e1113]",
-  eggcode: "bg-[#100e15]",
-};
-
 function BonfireMotif() {
   // three MPC signing nodes, connected — a wallet secured by no single point of failure
   return (
@@ -100,25 +89,8 @@ function EggcodeMotif() {
   );
 }
 
-const MOTIFS: Record<string, () => ReactElement> = {
+export const MOTIFS: Record<string, () => ReactElement> = {
   bonfire: BonfireMotif,
   trueman: TruemanMotif,
   eggcode: EggcodeMotif,
 };
-
-export default function ProjectVisual({ slug, number }: ProjectVisualProps) {
-  const Motif = MOTIFS[slug];
-  const tone = TONES[slug] ?? "bg-background-raised";
-
-  return (
-    <div
-      className={`relative flex h-full w-full items-center justify-center overflow-hidden text-foreground ${tone}`}
-      aria-hidden="true"
-    >
-      <span className="font-display pointer-events-none absolute bottom-[-6%] left-[4%] select-none text-[34%] leading-none text-foreground/6">
-        {number}
-      </span>
-      {Motif ? <Motif /> : null}
-    </div>
-  );
-}

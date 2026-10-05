@@ -21,7 +21,7 @@ export default function FloatingNav() {
     >
       <nav
         aria-label="Primary"
-        className="relative flex items-center gap-1.5 rounded-full bg-white/[0.08] p-2 backdrop-blur-2xl supports-[backdrop-filter]:bg-white/[0.08]"
+        className="relative flex items-center gap-1.5 rounded-full bg-black/55 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.25)] ring-1 ring-white/10 backdrop-blur-xl supports-backdrop-filter:bg-black/45"
       >
         <a
           href="#home"
@@ -42,7 +42,7 @@ export default function FloatingNav() {
             <li key={link.href}>
               <a
                 href={link.href}
-                className="group relative inline-flex flex-col items-center overflow-hidden rounded-full px-4 py-3.5 font-display text-[11px] tracking-[0.1em] uppercase text-muted transition-colors duration-300 hover:text-zinc-500 lg:px-5 lg:text-[12px]"
+                className="group relative inline-flex flex-col items-center overflow-hidden rounded-full px-4 py-3.5 font-display text-[11px] tracking-[0.1em] uppercase text-white/75 transition-colors duration-300 hover:text-white lg:px-5 lg:text-[12px]"
               >
                 <span
                   aria-hidden="true"

@@ -52,8 +52,8 @@ function SocialLink({ label, href }: { label: string; href: string }) {
 
 export default function Footer() {
   return (
-    <footer className="relative flex h-svh flex-col bg-black p-3 sm:p-5 lg:p-6">
-      <div className="relative flex h-full flex-col overflow-hidden rounded-[36px] bg-[#161616] px-6 py-8 sm:rounded-[60px] sm:px-10 sm:py-10 lg:rounded-[90px] lg:px-16 lg:py-12 xl:rounded-[120px]">
+    <footer className="relative flex h-svh flex-col bg-black">
+      <div className="relative flex h-full flex-col overflow-hidden rounded-t-[36px] bg-[#3B308F] px-6 py-8 sm:rounded-t-[60px] sm:px-10 sm:py-10 lg:rounded-t-[90px] lg:px-16 lg:py-12 xl:rounded-t-[120px]">
         <div className="grid pt-10 shrink-0 grid-cols-1 items-start gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
           {/* intro */}
           <div className="flex flex-col">
