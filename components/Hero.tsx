@@ -1,135 +1,334 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import {
   motion,
+  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
-  useMotionValueEvent,
+  useTransform,
+  type MotionValue,
 } from "motion/react";
-import TextReveal from "./TextReveal";
+import { Layers, Send, Zap } from "lucide-react";
+import { BLOOMS, BLOOM_W, BloomArt, type Bloom } from "./HeroBlooms";
 
-const easeOut = [0.16, 1, 0.3, 1] as const;
+// facts in the strip at the bottom of the hero — keep them true
+const FACTS = [
+  { icon: Zap, title: "3+ years", sub: "shipping to production" },
+  { icon: Layers, title: "Web2 + Web3", sub: "full-stack to on-chain" },
+  { icon: Send, title: "Open to work", sub: "freelance & full-time" },
+];
 
+// soft cloud silhouette (bumps along the top, flat bottom)
+const CLOUD =
+  "M0 220 V150 C 10 100, 60 80, 100 100 C 110 50, 170 30, 210 60 C 240 20, 310 20, 330 70 C 370 50, 420 70, 430 110 C 470 100, 500 130, 500 160 V220 Z";
+
+const BLUE = "#2452A8";
+const WINDOW = "#1C4290";
+const CREAM = "#F6ECDC";
+
+/*
+ * Poster hero — work objects growing out of a polaroid frame.
+ * Layers (back → front): blue poster bg + name, the frame's blue window,
+ * the cream frame, then the "blooms". The blooms are clipped only below the
+ * window's bottom edge, so as they grow on scroll they spill over the top of
+ * the frame and in front of the name.
+ */
 export default function Hero() {
-  const shouldReduceMotion = useReducedMotion();
+  const reduce = useReducedMotion();
   const wrapperRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const durationRef = useRef(0);
 
-  // 0 -> 1 across the hero's own scroll travel (pinned while the video scrubs).
   const { scrollYProgress } = useScroll({
     target: wrapperRef,
     offset: ["start start", "end end"],
   });
-
-  // Critically-damped spring: smooths raw scroll deltas without overshoot,
-  // so the video timeline never jumps or bounces past where the scroll is.
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 120,
+  const p = useSpring(scrollYProgress, {
+    stiffness: 140,
     damping: 30,
-    mass: 0.5,
-    restDelta: 0.001,
+    mass: 0.4,
+    restDelta: 0.0005,
   });
 
+  // mouse parallax (desktop)
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 80, damping: 20 });
+  const sy = useSpring(my, { stiffness: 80, damping: 20 });
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || shouldReduceMotion) return;
-
-    const handleLoadedMetadata = () => {
-      durationRef.current = video.duration || 0;
+    if (reduce || window.matchMedia("(pointer: coarse)").matches) return;
+    const onMove = (e: PointerEvent) => {
+      mx.set(e.clientX / window.innerWidth - 0.5);
+      my.set(e.clientY / window.innerHeight - 0.5);
     };
-    if (video.readyState >= 1) handleLoadedMetadata();
-    video.addEventListener("loadedmetadata", handleLoadedMetadata);
-    return () => video.removeEventListener("loadedmetadata", handleLoadedMetadata);
-  }, [shouldReduceMotion]);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
+  }, [reduce, mx, my]);
 
-  // Scrub the video's timeline from the smoothed scroll value. This runs on
-  // Motion's own rAF-batched update loop, not on every raw scroll/wheel event,
-  // and never touches React state, so it can't trigger a re-render.
-  useMotionValueEvent(smoothProgress, "change", (progress) => {
-    const video = videoRef.current;
-    const duration = durationRef.current;
-    if (!video || !duration || shouldReduceMotion) return;
-
-    const time = Math.min(Math.max(progress, 0), 1) * duration;
-    if (Math.abs(video.currentTime - time) > 0.02) {
-      video.currentTime = time;
-    }
-  });
-
-  const fadeIn = (delay: number, y = 12) => ({
-    initial: { opacity: 0, y: shouldReduceMotion ? 0 : y },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.8, delay, ease: easeOut },
-  });
+  const titleX = useTransform(sx, (v) => v * 14);
+  const titleY = useTransform(p, [0, 0.7], ["0vh", "5vh"]);
+  const frameX = useTransform(sx, (v) => v * -6);
+  const frameY = useTransform(sy, (v) => v * -6);
+  const frameRotate = useTransform(sx, (v) => v * 2);
+  const frontX = useTransform(sx, (v) => v * -18);
+  const frontY = useTransform(sy, (v) => v * -10);
+  const hintOpacity = useTransform(p, [0, 0.12], [1, 0]);
+  // clouds rise slowly (back layer slower than front) and drift with the mouse
+  const cloudBackY = useTransform(p, [0, 1], ["6%", "-6%"]);
+  const cloudFrontY = useTransform(p, [0, 1], ["14%", "-10%"]);
+  const cloudX = useTransform(sx, (v) => v * 10);
 
   return (
-    <section
-      id="home"
-      ref={wrapperRef}
-      className="relative h-[130vh] w-full bg-[#efe6d5]"
-    >
-      <div className="sticky top-0 h-svh w-full overflow-hidden rounded-t-none rounded-b-[28px] bg-[#3f8fe0] sm:rounded-b-[44px] lg:rounded-b-[72px]">
-        {/* scroll-scrubbed motion background; falls back to the static
-            landscape when reduced motion is requested */}
-        {shouldReduceMotion ? (
-          <Image
-            src="/images/hero-mountain.png"
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            className="z-0 object-cover object-[35%_60%] sm:object-[40%_60%] lg:object-center"
-          />
-        ) : (
-          <video
-            ref={videoRef}
-            src="/video/hero-motion.mp4"
-            poster="/images/hero-mountain.png"
-            muted
-            playsInline
-            preload="metadata"
-            aria-hidden="true"
-            className="absolute inset-0 z-0 h-full w-full object-cover object-[35%_60%] sm:object-[40%_60%] lg:object-center"
-          />
-        )}
-
-        {/* subtle neutral overlay, slightly stronger behind the centered type */}
+    // cream wrapper fills the area behind the hero's curved bottom corners
+    <div className="bg-[#fffdf6]">
+      <section
+        id="home"
+        ref={wrapperRef}
+        // overflow-clip (not hidden) so the sticky panel keeps working; the curve only
+        // shows once the pinned part has scrolled past
+        className={`relative overflow-clip rounded-b-[32px] sm:rounded-b-[56px] lg:rounded-b-[80px] ${reduce ? "pb-[6vh]" : "h-[236vh]"}`}
+        style={{ backgroundColor: BLUE }}
+      >
         <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(0,0,0,0.09)_0%,rgba(0,0,0,0.15)_50%,rgba(0,0,0,0.09)_100%)]"
-        />
-
-        <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 pb-28 text-center [text-shadow:0_1px_16px_rgba(0,0,0,0.25)] sm:px-10 sm:pb-24 lg:px-16">
-          <motion.p
-            {...fadeIn(0.05, 10)}
-            className="font-mono-label text-[10px] tracking-[0.2em] text-white/90 uppercase sm:text-xs"
+          className="sticky top-0 h-svh w-full overflow-hidden"
+          style={{ backgroundColor: BLUE }}
+        >
+          {/* paper grain */}
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-30 h-full w-full opacity-[0.09] mix-blend-overlay"
           >
-            Build · Explore · Learn · Repeat
-          </motion.p>
+            <filter id="hero-grain">
+              <feTurbulence
+                type="fractalNoise"
+                baseFrequency="0.9"
+                numOctaves="2"
+                stitchTiles="stitch"
+              />
+            </filter>
+            <rect width="100%" height="100%" filter="url(#hero-grain)" />
+          </svg>
 
-          <h1 className="font-display mt-5 text-[14vw] leading-[0.92] tracking-[-0.04em] text-white sm:mt-6 sm:text-[11vw] lg:text-[9vw]">
-            <TextReveal text="Ashutosh" delay={0.2} mode="mount" />
-          </h1>
-
-          <motion.p
-            {...fadeIn(0.6, 10)}
-            className="font-display mt-4 text-[11px] tracking-[0.08em] text-white/95 uppercase sm:mt-5 sm:text-sm"
+          {/* twinkling sparkles */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 z-0"
           >
-            Software Engineer · Builder
-          </motion.p>
+            {[
+              [12, 22, 22, 0],
+              [86, 18, 18, 1.2],
+              [21, 60, 14, 2.1],
+              [80, 54, 20, 0.6],
+              [93, 36, 12, 1.8],
+              [6, 42, 12, 2.6],
+            ].map(([x, y, size, d], i) => (
+              <svg
+                key={i}
+                viewBox="0 0 20 20"
+                className="hero-twinkle absolute"
+                style={{
+                  left: `${x}%`,
+                  top: `${y}%`,
+                  width: size,
+                  height: size,
+                  animationDelay: `${d}s`,
+                }}
+              >
+                <path
+                  d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z"
+                  fill={CREAM}
+                />
+              </svg>
+            ))}
+          </div>
 
-          <motion.p
-            {...fadeIn(0.75, 10)}
-            className="mt-4 max-w-[260px] text-[14px] leading-relaxed text-white/90 sm:max-w-sm sm:text-base lg:max-w-md lg:text-lg"
+          {/* clouds — bottom corners, two depths */}
+          <motion.div
+            style={reduce ? undefined : { y: cloudBackY, x: cloudX }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[1]"
+            aria-hidden="true"
           >
-            Turning ideas into products, systems, and infrastructure.
-          </motion.p>
+            <svg
+              viewBox="0 0 500 220"
+              className="absolute bottom-[-2%] left-[-6%] w-[46vw] max-w-[620px] min-w-[260px]"
+            >
+              <path d={CLOUD} fill="#3261BA" />
+            </svg>
+            <svg
+              viewBox="0 0 500 220"
+              className="absolute right-[-8%] bottom-[-2%] w-[48vw] max-w-[640px] min-w-[260px] -scale-x-100"
+            >
+              <path d={CLOUD} fill="#3261BA" />
+            </svg>
+          </motion.div>
+          <motion.div
+            style={reduce ? undefined : { y: cloudFrontY }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 z-[2]"
+            aria-hidden="true"
+          >
+            <svg
+              viewBox="0 0 500 220"
+              className="absolute bottom-[-6%] left-[-12%] w-[34vw] max-w-[460px] min-w-[200px]"
+            >
+              <path d={CLOUD} fill="#3E6FCB" />
+            </svg>
+            <svg
+              viewBox="0 0 500 220"
+              className="absolute right-[-14%] bottom-[-6%] w-[36vw] max-w-[480px] min-w-[200px] -scale-x-100"
+            >
+              <path d={CLOUD} fill="#3E6FCB" />
+            </svg>
+          </motion.div>
+
+          {/* facts strip + scroll hint */}
+          <div
+            className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-3 px-4 pb-5 sm:gap-4 sm:pb-6"
+            style={{ color: CREAM }}
+          >
+            <ul className="flex items-stretch justify-center divide-x divide-white/25">
+              {FACTS.map(({ icon: Icon, title, sub }) => (
+                <li
+                  key={title}
+                  className="flex items-center gap-2.5 px-3 sm:gap-3.5 sm:px-8"
+                >
+                  <Icon
+                    className="hidden h-7 w-7 shrink-0 opacity-90 sm:block"
+                    strokeWidth={1.6}
+                    aria-hidden="true"
+                  />
+                  <div className="leading-tight">
+                    <p className="font-poster text-[14px] font-bold sm:text-[19px]">
+                      {title}
+                    </p>
+                    <p className="text-[11px] opacity-75 sm:text-[13.5px]">
+                      {sub}
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <motion.p
+              style={reduce ? undefined : { opacity: hintOpacity }}
+              className="font-hand flex items-center gap-1.5 text-[19px] leading-none sm:text-[21px]"
+            >
+              scroll down <span aria-hidden="true">↓</span>
+            </motion.p>
+          </div>
+
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 pt-16 pb-[15vh] lg:pb-[13vh]">
+            {/* title */}
+            <motion.div
+              style={reduce ? undefined : { x: titleX, y: titleY }}
+              className="relative z-0 text-center"
+            >
+              <p className="font-hand -rotate-[3deg] text-[22px] leading-none text-[#F7EBA0] sm:text-[28px]">
+                hi, I&rsquo;m Ashutosh, a software engineer &amp;
+              </p>
+              <h1 className="font-poster mt-1 text-[22vw] font-black uppercase leading-[0.95] tracking-[-0.04em] sm:text-[14vw] lg:text-[9vw]">
+                <span style={{ color: CREAM }}>Builder</span>
+              </h1>
+            </motion.div>
+
+            {/* frame + blooms */}
+            <motion.div
+              style={
+                reduce
+                  ? undefined
+                  : { x: frameX, y: frameY, rotate: frameRotate }
+              }
+              className="relative z-10 mt-[2vh] aspect-[4/5] w-[min(68vw,34vh)]"
+            >
+              {/* the cream polaroid with its blue window */}
+              <div
+                className="absolute inset-0 rounded-[6px] shadow-[0_30px_60px_-30px_rgba(0,0,0,0.6)]"
+                style={{ backgroundColor: CREAM }}
+              >
+                <div
+                  className="absolute top-[7%] right-[7%] bottom-[24%] left-[7%] overflow-hidden"
+                  style={{ backgroundColor: WINDOW }}
+                >
+                  {/* a few sparkles in the window */}
+                  <svg
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                    className="absolute inset-0 h-full w-full"
+                    aria-hidden="true"
+                  >
+                    {[
+                      [16, 18, 2.2],
+                      [80, 12, 1.6],
+                      [62, 30, 1.2],
+                      [28, 40, 1.4],
+                      [88, 44, 2],
+                    ].map(([x, y, r], i) => (
+                      <path
+                        key={i}
+                        d={`M${x} ${y - r * 2} L${x + r * 0.5} ${y - r * 0.5} L${x + r * 2} ${y} L${x + r * 0.5} ${y + r * 0.5} L${x} ${y + r * 2} L${x - r * 0.5} ${y + r * 0.5} L${x - r * 2} ${y} L${x - r * 0.5} ${y - r * 0.5} Z`}
+                        fill={CREAM}
+                        opacity="0.75"
+                      />
+                    ))}
+                  </svg>
+                </div>
+              </div>
+
+              {/* blooms — clipped only below the window's bottom edge */}
+              <motion.div
+                style={reduce ? undefined : { x: frontX, y: frontY }}
+                className="absolute inset-0 [clip-path:inset(-200%_-60%_24%_-60%)]"
+              >
+                {BLOOMS.map((b, i) => (
+                  <BloomLayer
+                    key={b.key}
+                    bloom={b}
+                    index={i}
+                    progress={p}
+                    reduce={!!reduce}
+                  />
+                ))}
+              </motion.div>
+            </motion.div>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
+  );
+}
+
+function BloomLayer({
+  bloom,
+  index,
+  progress,
+  reduce,
+}: {
+  bloom: Bloom;
+  index: number;
+  progress: MotionValue<number>;
+  reduce: boolean;
+}) {
+  // each bloom grows on its own slightly offset schedule
+  const from = 0.02 + index * 0.035;
+  const to = 0.55 + index * 0.03;
+  const y = useTransform(progress, [from, to], [`${bloom.start * 100}%`, "0%"]);
+  const rotate = useTransform(
+    progress,
+    [from, to],
+    [bloom.rotate * 0.3, bloom.rotate],
+  );
+  const scale = useTransform(progress, [from, to], [0.9, 1]);
+
+  return (
+    <motion.div
+      className="absolute bottom-[24%] origin-bottom"
+      style={{
+        left: `${bloom.x}%`,
+        width: `${BLOOM_W}%`,
+        height: `${bloom.h}%`,
+        x: "-50%",
+        ...(reduce ? { rotate: bloom.rotate } : { y, rotate, scale }),
+      }}
+    >
+      <BloomArt bloom={bloom} />
+    </motion.div>
   );
 }

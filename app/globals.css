@@ -117,6 +117,46 @@ body {
   }
 }
 
+/* Footer — social icons hide behind the avatar and pop out in an arc */
+.social-pop {
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.3);
+  transition:
+    transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.2s ease;
+}
+.group\/social:hover .social-pop,
+.group\/social:focus-within .social-pop,
+.group\/social[data-open] .social-pop {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1);
+}
+/* invisible bridge so the cursor can travel from the photo to the icons without closing them */
+.group\/social:hover::before {
+  content: "";
+  position: absolute;
+  inset: -90px -70px 0 -70px;
+}
+.social-pop:hover {
+  transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 4px)) scale(1.1) rotate(-8deg) !important;
+}
+
+/* Hero sparkles */
+.hero-twinkle {
+  animation: hero-twinkle 3.2s ease-in-out infinite;
+}
+@keyframes hero-twinkle {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
 .no-scrollbar {
   scrollbar-width: none;
 }

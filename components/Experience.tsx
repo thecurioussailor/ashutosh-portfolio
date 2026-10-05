@@ -8,8 +8,8 @@ const TILTS = [-1.5, 1.2, -1];
 
 export default function Experience() {
   return (
-    // wrapper paints the corner cut-outs: cream above (About), page bg below
-    <div className="bg-[linear-gradient(to_bottom,#fffdf6_50%,var(--background)_50%)]">
+    // wrapper paints the corner cut-outs: cream above (About) and below (Contact)
+    <div className="bg-[#fffdf6]">
       <section
         id="experience"
         className="relative overflow-hidden rounded-[36px] bg-[#C9F1F5] px-6 pt-24 pb-20 text-[#111] sm:rounded-[60px] sm:px-10 sm:pt-32 sm:pb-24 lg:rounded-[90px] lg:px-16 xl:rounded-[120px]"
