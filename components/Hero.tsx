@@ -10,15 +10,8 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { Layers, Send, Zap } from "lucide-react";
 import { BLOOMS, BLOOM_W, BloomArt, type Bloom } from "./HeroBlooms";
 
-// facts in the strip at the bottom of the hero — keep them true
-const FACTS = [
-  { icon: Zap, title: "3+ years", sub: "shipping to production" },
-  { icon: Layers, title: "Web2 + Web3", sub: "full-stack to on-chain" },
-  { icon: Send, title: "Open to work", sub: "freelance & full-time" },
-];
 
 // soft cloud silhouette (bumps along the top, flat bottom)
 const CLOUD =
@@ -180,33 +173,11 @@ export default function Hero() {
             </svg>
           </motion.div>
 
-          {/* facts strip + scroll hint */}
+          {/* scroll hint */}
           <div
             className="absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-3 px-4 pb-5 sm:gap-4 sm:pb-6"
             style={{ color: CREAM }}
           >
-            <ul className="flex items-stretch justify-center divide-x divide-white/25">
-              {FACTS.map(({ icon: Icon, title, sub }) => (
-                <li
-                  key={title}
-                  className="flex items-center gap-2.5 px-3 sm:gap-3.5 sm:px-8"
-                >
-                  <Icon
-                    className="hidden h-7 w-7 shrink-0 opacity-90 sm:block"
-                    strokeWidth={1.6}
-                    aria-hidden="true"
-                  />
-                  <div className="leading-tight">
-                    <p className="font-poster text-[14px] font-bold sm:text-[19px]">
-                      {title}
-                    </p>
-                    <p className="text-[11px] opacity-75 sm:text-[13.5px]">
-                      {sub}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
             <motion.p
               style={reduce ? undefined : { opacity: hintOpacity }}
               className="font-hand flex items-center gap-1.5 text-[19px] leading-none sm:text-[21px]"
@@ -215,7 +186,7 @@ export default function Hero() {
             </motion.p>
           </div>
 
-          <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 pt-16 pb-[15vh] lg:pb-[13vh]">
+          <div className="relative z-10 flex h-full flex-col items-center justify-center px-6 pt-16 pb-[8vh]">
             {/* title */}
             <motion.div
               style={reduce ? undefined : { x: titleX, y: titleY }}

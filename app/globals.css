@@ -139,6 +139,9 @@ body {
   position: absolute;
   inset: -90px -70px 0 -70px;
 }
+.group\/social[data-dir="down"]:hover::before {
+  inset: 0 -70px -90px -70px;
+}
 .social-pop:hover {
   transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) - 4px)) scale(1.1) rotate(-8deg) !important;
 }

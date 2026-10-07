@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
+import SocialAvatar from "./SocialAvatar";
 import { ArrowRight, Menu, X } from "lucide-react";
 
 const links = [
@@ -12,13 +12,16 @@ const links = [
   { label: "Experience", href: "#experience" },
 ];
 
-const pill =
-  "rounded-full bg-[#F7EBA0] px-5 py-2.5 text-[16px] font-semibold tracking-[-0.01em] text-[#111] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#F3E07A]";
+// frosted dark glass — readable over the blue hero and the light sections alike
+const glass =
+  "rounded-full bg-[#0d1330]/35 ring-1 ring-white/20 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.45)] backdrop-blur-xl backdrop-saturate-150";
+const linkText = "relative z-10 block rounded-full px-5 py-2.5 text-[15.5px] font-semibold tracking-[-0.01em] transition-colors duration-200";
 
 export default function TopNav() {
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
+  const [hovered, setHovered] = useState<number | null>(null);
 
   // hide while scrolling down, reveal on any scroll up
   useMotionValueEvent(scrollY, "change", (y) => {
@@ -38,18 +41,23 @@ export default function TopNav() {
         aria-label="Primary"
         className="mx-auto flex max-w-6xl items-center justify-between gap-3"
       >
-        <a
-          href="#home"
-          aria-label="Ashutosh Sagar — home"
-          className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-[#F7EBA0] transition-transform duration-300 hover:rotate-[-6deg] sm:h-13 sm:w-13"
-        >
-          <Image src="/images/x-dp.png" alt="Ashutosh Sagar" fill sizes="52px" className="object-cover" />
-        </a>
+        {/* hover (tap on phones) to pop the socials out below the photo */}
+        <div className="-m-2">
+          <SocialAvatar direction="down" size={50} />
+        </div>
 
-        <ul className="hidden items-center gap-2 md:flex">
-          {links.map((link) => (
-            <li key={link.href}>
-              <a href={link.href} className={`${pill} inline-block`}>
+        <ul onMouseLeave={() => setHovered(null)} className={`hidden items-center gap-0.5 p-1.5 md:flex ${glass}`}>
+          {links.map((link, i) => (
+            <li key={link.href} className="relative" onMouseEnter={() => setHovered(i)}>
+              {/* yellow pill that slides to whichever link is hovered */}
+              {hovered === i && (
+                <motion.span
+                  layoutId="nav-hover"
+                  className="absolute inset-0 rounded-full bg-[#F7EBA0]"
+                  transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                />
+              )}
+              <a href={link.href} className={`${linkText} ${hovered === i ? "text-[#111]" : "text-[#fffdf6]"}`}>
                 {link.label}
               </a>
             </li>
@@ -72,7 +80,7 @@ export default function TopNav() {
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-[#F7EBA0] text-[#111] md:hidden"
+            className={`flex h-11 w-11 items-center justify-center text-[#fffdf6] md:hidden ${glass}`}
           >
             {open ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -83,11 +91,11 @@ export default function TopNav() {
         <motion.ul
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-auto mt-3 flex max-w-6xl flex-wrap justify-end gap-2 md:hidden"
+          className={`mt-3 ml-auto flex w-fit flex-col gap-0.5 p-1.5 md:hidden ${glass} rounded-3xl`}
         >
           {links.map((link) => (
             <li key={link.href}>
-              <a href={link.href} onClick={() => setOpen(false)} className={`${pill} inline-block`}>
+              <a href={link.href} onClick={() => setOpen(false)} className={`${linkText} text-[#fffdf6] hover:bg-[#F7EBA0] hover:text-[#111]`}>
                 {link.label}
               </a>
             </li>
