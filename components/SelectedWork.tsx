@@ -1,8 +1,12 @@
 import { projects } from "@/data/projects";
+import { getProjectMedia } from "@/lib/projectMedia";
 import ProjectCarousel from "./ProjectCarousel";
 import Reveal from "./Reveal";
 
 export default function SelectedWork() {
+  // whatever media is in public/projects/<slug>/ (read on the server)
+  const media = Object.fromEntries(projects.map((p) => [p.slug, getProjectMedia(p.slug)]));
+
   return (
     <section
       id="work"
@@ -25,13 +29,13 @@ export default function SelectedWork() {
           <p className="mx-auto mt-6 max-w-xl text-[17px] font-medium leading-snug tracking-[-0.01em] sm:mt-8 sm:text-[22px]">
             Products, infrastructure and experiments.
             <br />
-            Pick a cover to read the full story.
+            Pick a cover to see it in action.
           </p>
         </Reveal>
       </div>
 
       <Reveal className="mt-14 sm:mt-20" delay={0.1}>
-        <ProjectCarousel projects={projects} />
+        <ProjectCarousel projects={projects} media={media} />
       </Reveal>
     </section>
   );

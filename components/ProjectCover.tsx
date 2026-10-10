@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Project } from "@/data/projects";
 import { MOTIFS } from "./ProjectVisual";
+import PreviewVideo from "./PreviewVideo";
 
 type CoverTheme = {
   frame: string; // thick outer border, like a book jacket
@@ -30,7 +31,16 @@ export function getCoverTheme(slug: string) {
   return THEMES[slug] ?? FALLBACK;
 }
 
-export default function ProjectCover({ project }: { project: Project }) {
+export default function ProjectCover({
+  project,
+  preview,
+  playing = false,
+}: {
+  project: Project;
+  /** optional silent loop that plays over the cover */
+  preview?: string;
+  playing?: boolean;
+}) {
   const theme = getCoverTheme(project.slug);
   const Motif = MOTIFS[project.slug];
 
@@ -62,22 +72,35 @@ export default function ProjectCover({ project }: { project: Project }) {
           </span>
         )}
 
+        {/* hover preview clip + a soft shade so the title stays readable */}
+        {preview && (
+          <>
+            <PreviewVideo src={preview} playing={playing} />
+            <div
+              aria-hidden="true"
+              className={`pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/70 via-black/0 to-black/30 transition-opacity duration-500 ${
+                playing ? "opacity-100" : "opacity-0"
+              }`}
+            />
+          </>
+        )}
+
         {/* badge */}
         {project.badge && (
           <span
-            className="absolute left-4 top-5 -rotate-2 rounded-full px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white shadow-sm sm:text-[13px]"
+            className="absolute left-4 top-5 z-[2] -rotate-2 rounded-full px-3.5 py-1.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-white shadow-sm sm:text-[13px]"
             style={{ backgroundColor: theme.badge }}
           >
             {project.badge}
           </span>
         )}
 
-        <span className="font-mono-label absolute right-5 top-6 text-[11px] opacity-70">
+        <span className="font-mono-label absolute right-5 top-6 z-[2] text-[11px] opacity-70">
           Nº {project.number}
         </span>
 
         {/* title block */}
-        <div className="absolute inset-x-5 bottom-5 sm:inset-x-6 sm:bottom-6">
+        <div className="absolute inset-x-5 bottom-5 z-[2] sm:inset-x-6 sm:bottom-6" style={preview && playing ? { color: "#fff" } : undefined}>
           <p className="font-mono-label mb-2 text-[10.5px] uppercase opacity-75">
             {project.category}
           </p>

@@ -1,11 +1,22 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { CSSProperties, MouseEvent, PointerEvent } from "react";
+import { AnimatePresence } from "motion/react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { Project } from "@/data/projects";
+import type { ProjectMedia } from "@/lib/projectMedia";
 import ProjectCover from "./ProjectCover";
+import ProjectPanel from "./ProjectPanel";
+
+// touch devices play previews when a card is in view instead of on hover
+const COARSE = "(pointer: coarse)";
+const isCoarse = () => window.matchMedia(COARSE).matches;
+const subscribeCoarse = (cb: () => void) => {
+  const mq = window.matchMedia(COARSE);
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
 
 // hand-placed feel: each card gets its own tilt + vertical nudge
 const TILTS = [
@@ -17,11 +28,55 @@ const TILTS = [
   { r: 1.5, y: 20 },
 ];
 
-export default function ProjectCarousel({ projects }: { projects: Project[] }) {
+export default function ProjectCarousel({
+  projects,
+  media,
+}: {
+  projects: Project[];
+  media: Record<string, ProjectMedia>;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
   const drag = useRef({ down: false, startX: 0, startLeft: 0, moved: false });
+
+  // which card's preview clip is playing (hover on desktop, in-view on touch)
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [inView, setInView] = useState<Set<string>>(new Set());
+  const touch = useSyncExternalStore(subscribeCoarse, isCoarse, () => false);
+  // which project's panel is open
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isCoarse()) return;
+    const el = trackRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) =>
+        setInView((prev) => {
+          const next = new Set(prev);
+          entries.forEach((e) => {
+            const slug = (e.target as HTMLElement).dataset.slug!;
+            if (e.isIntersecting) next.add(slug);
+            else next.delete(slug);
+          });
+          return next;
+        }),
+      { threshold: 0.6 },
+    );
+    el.querySelectorAll<HTMLElement>("[data-card]").forEach((c) => io.observe(c));
+    return () => io.disconnect();
+  }, []);
+
+  const closePanel = useCallback(() => setOpenIndex(null), []);
+  const prevPanel = useCallback(
+    () => setOpenIndex((i) => (i === null ? i : (i - 1 + projects.length) % projects.length)),
+    [projects.length],
+  );
+  const nextPanel = useCallback(
+    () => setOpenIndex((i) => (i === null ? i : (i + 1) % projects.length)),
+    [projects.length],
+  );
 
   const update = useCallback(() => {
     const el = trackRef.current;
@@ -125,15 +180,24 @@ export default function ProjectCarousel({ projects }: { projects: Project[] }) {
         {projects.map((project, i) => {
           const tilt = TILTS[i % TILTS.length];
           return (
-            <Link
+            <button
+              type="button"
               key={project.slug}
-              href={`/work/${project.slug}`}
               data-card
+              data-slug={project.slug}
               draggable={false}
-              className="tilt-card group w-[76vw] shrink-0 snap-start outline-none sm:w-[330px] lg:w-[350px]"
+              onClick={() => setOpenIndex(i)}
+              onMouseEnter={() => setHovered(project.slug)}
+              onMouseLeave={() => setHovered((h) => (h === project.slug ? null : h))}
+              aria-label={`Open ${project.name}`}
+              className="tilt-card group w-[76vw] shrink-0 cursor-pointer snap-start text-left outline-none sm:w-[330px] lg:w-[350px]"
               style={{ "--r": `${tilt.r}deg`, "--y": `${tilt.y}px` } as CSSProperties}
             >
-              <ProjectCover project={project} />
+              <ProjectCover
+                project={project}
+                preview={media[project.slug]?.preview}
+                playing={touch ? inView.has(project.slug) : hovered === project.slug}
+              />
 
               <div className="mt-5 px-1">
                 <div className="flex items-baseline justify-between gap-3">
@@ -151,12 +215,24 @@ export default function ProjectCarousel({ projects }: { projects: Project[] }) {
                   {project.technologies.join("  ·  ")}
                 </p>
               </div>
-            </Link>
+            </button>
           );
         })}
         {/* trailing spacer so the last card can snap fully into view */}
         <div aria-hidden className="w-px shrink-0" />
       </div>
+
+      <AnimatePresence>
+        {openIndex !== null && (
+          <ProjectPanel
+            project={projects[openIndex]}
+            media={media[projects[openIndex].slug] ?? { shots: [] }}
+            onClose={closePanel}
+            onPrev={prevPanel}
+            onNext={nextPanel}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
